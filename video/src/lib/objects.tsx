@@ -216,7 +216,11 @@ export const FolderIcon: React.FC<{
   return (
     <g opacity={opacity}>
       <SketchPath d={d} fill={fill} progress={progress} seed={seed} strokeWidth={4} color={color} />
-      {label ? <T x={x + w / 2} y={y + h / 2 + 18} text={label} size={labelSize} color={color} anchor="middle" font="body" /> : null}
+      {label ? (
+        <g opacity={Math.max(0, Math.min(1, progress))}>
+          <T x={x + w / 2} y={y + h / 2 + 18} text={label} size={labelSize} color={color} anchor="middle" font="body" />
+        </g>
+      ) : null}
     </g>
   );
 };
@@ -357,8 +361,10 @@ export const TreeNode: React.FC<{
   <g opacity={opacity}>
     {glow > 0 ? <SketchRect x={x - 8} y={y - 8} w={w + 16} h={h + 16} fill="none" progress={glow} radius={18} seed={`${seed}-glow`} strokeWidth={3} color={GREEN} opacity={0.45} /> : null}
     <SketchRect x={x} y={y} w={w} h={h} fill={fill} progress={progress} radius={12} seed={seed} strokeWidth={4} color={color} />
-    <T x={x + w / 2} y={y + (sub ? h / 2 - 3 : h / 2 + labelSize * 0.34)} text={label} size={labelSize} color={color} anchor="middle" />
-    {sub ? <T x={x + w / 2} y={y + h / 2 + 42} text={sub} size={36} color={MUTED} anchor="middle" /> : null}
+    <g opacity={Math.max(0, Math.min(1, progress))}>
+      <T x={x + w / 2} y={y + (sub ? h / 2 - 3 : h / 2 + labelSize * 0.34)} text={label} size={labelSize} color={color} anchor="middle" />
+      {sub ? <T x={x + w / 2} y={y + h / 2 + 42} text={sub} size={36} color={MUTED} anchor="middle" /> : null}
+    </g>
   </g>
 );
 

@@ -216,19 +216,19 @@ export const Examples: React.FC = () => {
       <g opacity={chatP}>
         <SketchRect x={690} y={310} w={540} h={480} fill={WELL} progress={chatP} radius={18} seed="convo-frame" strokeWidth={3} color={SURFACE_2} />
         {[
-          {text: 'user: hello', y: 370, right: true, color: GREEN},
-          {text: 'assistant: hi!', y: 442, right: false, color: INK},
-          {text: 'user: write a poem', y: 514, right: true, color: GREEN},
-          {text: 'assistant: sure —', y: 586, right: false, color: INK},
-          {text: '…whole history…', y: 658, right: false, color: COMMENT},
-          {text: 'user: now shorten it', y: 730, right: true, color: GREEN},
+          {y: 360, right: true, w: 300},
+          {y: 446, right: false, w: 330},
+          {y: 532, right: true, w: 260},
+          {y: 618, right: false, w: 300},
+          {y: 704, right: true, w: 240},
         ].map((b, i) => {
-          const bw = 390;
-          const bx = b.right ? 1160 - bw : 720;
+          const bx = b.right ? 1200 - b.w : 720;
+          const p = prog(t, chat.start + 0.3 + i * 0.16, 0.3) * chatP;
           return (
-            <g key={i} opacity={prog(t, chat.start + 0.3 + i * 0.14, 0.3) * chatP}>
-              <SketchRect x={bx} y={b.y} w={bw} h={50} fill={b.right ? SURFACE_2 : SURFACE} progress={prog(t, chat.start + 0.3 + i * 0.14, 0.3)} radius={16} seed={`convo-${i}`} strokeWidth={3} color={b.color} />
-              <T x={bx + 18} y={b.y + 34} text={b.text} size={36} color={b.color === COMMENT ? MUTED : INK} />
+            <g key={i} opacity={p}>
+              <SketchRect x={bx} y={b.y} w={b.w} h={58} fill={b.right ? SURFACE_2 : SURFACE} progress={p} radius={18} seed={`convo-${i}`} strokeWidth={3} color={b.right ? GREEN : COMMENT} />
+              <SketchLine x1={bx + 18} y1={b.y + 22} x2={bx + b.w - 22} y2={b.y + 22} progress={p} seed={`convo-l1-${i}`} strokeWidth={3} color={b.right ? GREEN : MUTED} />
+              <SketchLine x1={bx + 18} y1={b.y + 40} x2={bx + b.w - 58} y2={b.y + 40} progress={p} seed={`convo-l2-${i}`} strokeWidth={3} color={b.right ? GREEN : MUTED} />
             </g>
           );
         })}
@@ -274,29 +274,52 @@ export const TreeIdea: React.FC = () => {
   const {cue} = useScene();
   const skip = cue('a tree is how we skip it', 0, [48.5, 52.16]);
   const serving = cue('serving framework called SGLang', 0, [52.7, 56.24]);
+  const sglang = cue('SGLang', 0, [55.48, 56.24]);
   const notes = cue('what an LLM saves', 0, [56.9, 61.58]);
 
-  const tree = prog(t, 0.15, 1.2);
-  const brand = prog(t, serving.start + 0.4, 0.5);
+  const cardsP = prog(t, 0.15, 0.7);
+  const sharedP = prog(t, skip.start, 0.6);
+  const tree = prog(t, serving.start - 0.1, 0.8);
+  const brand = prog(t, sglang.start, 0.5);
   const notesP = prog(t, notes.start, 0.8);
-  const treeDim = useDim(notes.start - 0.1, 0.25);
+  const cardsOut = 1 - prog(t, serving.start - 0.15, 0.3);
+  const treeDim = useDim(notes.start - 0.1, 0.3);
+
+  const request = (x: number, label: string, ending: string, color: string, delay: number) => (
+    <g opacity={prog(t, 0.2 + delay, 0.5) * cardsOut}>
+      <SketchRect x={x} y={140} w={620} h={190} fill={SURFACE} progress={prog(t, 0.2 + delay, 0.5)} radius={16} seed={`request-${label}`} strokeWidth={4} color={INK} />
+      <T x={x + 26} y={182} text={label} size={36} color={MUTED} />
+      <T x={x + 26} y={250} text="The cat sat on" size={42} color={GREEN} />
+      <T x={x + 26} y={302} text={ending} size={42} color={color} />
+      <SketchLine x1={x + 24} y1={268} x2={x + 250} y2={268} progress={prog(t, 0.2 + delay, 0.5)} seed={`prefix-rule-${label}`} strokeWidth={3} color={GREEN} />
+    </g>
+  );
 
   return (
     <Svg>
-      <g opacity={treeDim}>
-        <g opacity={tree}>
-          <TreeEdge x1={940} y1={340} x2={680} y2={500} progress={tree} seed="idea-e1" color={COMMENT} width={4} />
-          <TreeEdge x1={940} y1={340} x2={1130} y2={500} progress={tree} seed="idea-e2" color={COMMENT} width={4} />
-          <TreeNode x={760} y={250} w={360} h={98} label="prompt" color={INK} fill={SURFACE} progress={tree} seed="idea-root" labelSize={48} />
-          <TreeNode x={520} y={500} w={320} h={92} label="shared" color={GREEN} fill={SURFACE} progress={prog(t, skip.start + 0.45, 0.5)} seed="idea-left" labelSize={44} />
-          <TreeNode x={980} y={500} w={300} h={92} label="computed once" color={GREEN} fill={SURFACE} progress={prog(t, skip.start + 0.65, 0.5)} seed="idea-right" labelSize={38} />
-          <SketchPath d="M 690 620 Q 960 690 1230 620" progress={prog(t, skip.start + 0.8, 0.6)} seed="idea-brace" color={GREEN} strokeWidth={3.5} />
-          <T x={960} y={730} text="the radix tree" size={48} color={GREEN} anchor="middle" opacity={prog(t, skip.start + 0.7, 0.4)} />
-        </g>
+      {request(220, 'request A', 'the mat', YELLOW, 0)}
+      {request(1080, 'request B', 'the roof', ORANGE, 0.2)}
+
+      <g opacity={sharedP * cardsOut}>
+        <SketchRect x={640} y={356} w={640} h={60} fill={SURFACE} progress={sharedP} radius={30} seed="read-once-pill" strokeWidth={3.5} color={GREEN} />
+        <SketchCheck x={675} y={374} size={30} progress={sharedP} color={GREEN} />
+        <T x={960} y={398} text="read once" size={44} color={GREEN} anchor="middle" font="head" />
       </g>
+
+      <g opacity={treeDim}>
+        <TreeNode x={720} y={430} w={480} h={100} label="The cat sat on..." color={GREEN} fill={SURFACE} progress={tree} seed="cat-root" labelSize={42} glow={sharedP * tree} />
+        <SketchCheck x={795} y={366} size={30} progress={tree} color={GREEN} />
+        <T x={835} y={392} text="read once" size={38} color={GREEN} opacity={tree} />
+        <TreeEdge x1={960} y1={530} x2={660} y2={610} progress={tree} seed="cat-e1" color={GREEN} width={4} />
+        <TreeEdge x1={960} y1={530} x2={1060} y2={610} progress={tree} seed="cat-e2" color={ORANGE} width={4} />
+        <TreeNode x={530} y={610} w={260} h={82} label="the mat" color={YELLOW} fill={SURFACE} progress={prog(t, serving.start + 0.35, 0.5)} seed="cat-leaf-a" labelSize={40} />
+        <TreeNode x={930} y={610} w={260} h={82} label="the roof" color={ORANGE} fill={SURFACE} progress={prog(t, serving.start + 0.5, 0.5)} seed="cat-leaf-b" labelSize={40} />
+        <T x={960} y={750} text="different endings" size={38} color={MUTED} anchor="middle" opacity={prog(t, serving.start + 0.55, 0.4)} />
+      </g>
+
       <g opacity={brand}>
-        <T x={960} y={862} text="SGLang" size={108} color={INK} anchor="middle" font="head" />
-        <T x={960} y={912} text="a serving framework" size={40} color={MUTED} anchor="middle" />
+        <T x={960} y={850} text="SGLang" size={104} color={INK} anchor="middle" font="head" />
+        <T x={960} y={898} text="a serving framework" size={40} color={MUTED} anchor="middle" />
       </g>
 
       <g opacity={notesP}>
