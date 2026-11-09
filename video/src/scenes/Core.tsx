@@ -54,7 +54,7 @@ export const Student: React.FC = () => {
           <SketchRect x={1010} y={360} w={440} h={390} fill={SURFACE} progress={notesP} radius={14} seed="student-notes" strokeWidth={4} color={YELLOW} />
           <T x={1230} y={424} text="notes" size={52} color={YELLOW} anchor="middle" font="head" />
           {Array.from({length: 5}).map((_, i) => (
-            <SketchLine key={i} x1={1050} y1={480 + i * 46} x2={i === 4 ? 1240 : 1410} y2={480 + i * 46} progress={notesP} seed={`note-line-${i}`} strokeWidth={3} color={i === 2 ? YELLOW : COMMENT} />
+            <SketchLine key={i} x1={1050} y1={480 + i * 46} x2={i === 4 ? 1240 : 1410} y2={480 + i * 46} progress={notesP} seed={`note-line-${i}`} strokeWidth={3} color={COMMENT} />
           ))}
           <T x={1230} y={716} text="one note per token" size={36} color={MUTED} anchor="middle" />
         </g>

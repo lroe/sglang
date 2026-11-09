@@ -327,7 +327,7 @@ export const TreeIdea: React.FC = () => {
         <SketchRect x={1360} y={350} w={380} h={460} fill={SURFACE} progress={notesP} radius={14} seed="notes-card" strokeWidth={4} color={YELLOW} />
         <T x={1550} y={416} text="notes" size={52} color={YELLOW} anchor="middle" font="head" />
         {Array.from({length: 5}).map((_, i) => (
-          <SketchLine key={i} x1={1405} y1={470 + i * 48} x2={i === 4 ? 1580 : 1695} y2={470 + i * 48} progress={notesP} seed={`notes-line-${i}`} strokeWidth={3} color={i === 2 ? YELLOW : COMMENT} />
+          <SketchLine key={i} x1={1405} y1={470 + i * 48} x2={i === 4 ? 1580 : 1695} y2={470 + i * 48} progress={notesP} seed={`notes-line-${i}`} strokeWidth={3} color={COMMENT} />
         ))}
         <T x={1550} y={768} text="one note per token" size={38} color={MUTED} anchor="middle" />
       </g>
