@@ -1,0 +1,65 @@
+Say we are building a chatbot. Its system prompt is two thousand tokens long. It holds the rules, the tone of voice, a few examples, and every instruction that tells the chatbot how to behave.
+
+Now ten thousand users send a message. For every one of them, our G P U reads those same two thousand tokens from the start. That is twenty million tokens of reading, and the result is the same every time. That G P U is not cheap, and we are making it do the same homework ten thousand times.
+
+The system prompt is just the easy example. In a chat, every new message comes with the whole conversation before it. In document question answering, every question comes with the same document. In an agent, the same tool descriptions go along with every request.
+
+A lot of this work can be skipped, and a tree is how we skip it. That tree is the main idea behind a serving framework called S G Lang. To see how it works, we first need to know what an L L M saves while it works.
+
+An L L M writes one token at a time. To write each new token, it has to look at every token before it. Picture a student reading a long story and taking notes on each sentence. When it is time to write the next sentence, the student checks the notes instead of reading the whole story again. Those notes are called the K V cache, short for key and value cache.
+
+The notes for each token depend on every token before it. So if two requests start with the exact same text, their notes come out the same, and we can share them. But if even one word at the very start is different, all the notes after it change too.
+
+This means the second request does not need to redo the work for text that was already read. The hard part is making this happen automatically, for thousands of requests that all share different amounts of text.
+
+S G Lang is a serving framework for large language models and multimodal models. The name comes from structured generation and language. It has two parts. One is a runtime, which is the engine that runs the model. The other is a frontend language, which we use to write programs with many steps. The tree lives in the runtime, so we start there.
+
+The technique is called Radix Attention. A prefix is the beginning of a text that two texts have in common. The texts “The sky is blue” and “The sky is clear” share the prefix “The sky is”. A radix tree stores texts so that texts with the same beginning share one path, and the paths split only where the texts become different. S G Lang keeps the K V cache for its requests in one of these trees.
+
+If we have ever looked at the folders on our computer, we already know this shape. Take three requests. The first says, “Act as a helpful assistant. What is the capital of France?” The second is the same, but with Japan. The third says, “Act as a helpful assistant. Tell me a joke.”
+
+The top folder is the system prompt, “Act as a helpful assistant.” Its notes are computed once. Inside it is a folder for “what is the capital of”, and that is also computed once. Inside that folder are two more, one for France and one for Japan. Next to it sits a separate folder for the joke request.
+
+Now a new request arrives, asking about Italy. S G Lang walks down the same path and finds that everything up to “what is the capital of” is already there. It works out only the word Italy and adds a new folder for it. We never turn this on. It happens for every request.
+
+There is one catch. The matching starts from the very first token, so shared text only helps when it comes first. If we put a timestamp at the top of the system prompt, every request looks different from the first token, and the cache cannot help. The fix is to keep the fixed text at the front and the changing text at the end.
+
+The cache lives in G P U memory, and memory fills up. When it does, S G Lang removes the least recently used branches first. The system prompt that every request touches stays. The odd one-off question that nobody repeats goes.
+
+Quick side note. If we like learning about new A I tech without the jargon, subscribe. We break down new A I developments in simple words, so they are easy to follow. Now, back to S G Lang.
+
+Next, the frontend language. Real tasks usually have more than one step. For example, we might summarize a paragraph and then translate that summary into French. In S G Lang, we write this as a Python function, and it looks like a fill-in-the-blanks worksheet. We write some text and leave a blank called summary, and the model fills it in. Then we write a little more and leave a blank called french, and the model fills that in too, with the summary already on the page. Each blank is one call to a function named g e n.
+
+The useful part is that the program itself shows the runtime which text is fixed and which text is new. So when many requests run the same program, their shared beginnings go into the radix tree without any extra work from us.
+
+Next, batching. Continuous batching is standard in modern serving engines, so it is not what makes S G Lang different. In a normal batch, a finished request leaves an empty slot until the whole batch is done. With continuous batching, the next waiting request takes that slot right away. What S G Lang adds is that these batches also go through the radix tree, so the requests inside them can reuse each other’s prefixes.
+
+Now the S G in the name, structured generation. Suppose we ask the model for J SON with a name and a capital. Most of the time it works. Then one day the model forgets a closing bracket, or adds a friendly sentence before the J SON, and our parser crashes at three in the morning.
+
+S G Lang handles this with constrained decoding. We give it a rule for the format, and at every step the model is only allowed to pick tokens that keep the output valid. It works like a form with a dropdown instead of a free text box. If the format says an opening bracket must come next, every other token is blocked, so extra chatter before the J SON becomes impossible.
+
+There is also a speed bonus. When the format already fixes part of the output, like the key names in the J SON, S G Lang can sometimes fill those parts in directly, instead of generating them one token at a time.
+
+S G Lang has a long feature list, but three features are worth knowing.
+
+The first is speculative decoding, and it works like autocomplete on a phone. A small, fast helper model drafts the next few tokens. Then the big model reads all of them in one go and keeps the ones it agrees with. Reading five tokens costs about the same as writing one, so when the draft is mostly right, we get several tokens for the price of one. When the draft goes wrong, the big model keeps everything up to the first mistake and fixes that token itself, so the answer quality stays the same.
+
+The second needs two terms. Prefill is the stage where the model reads the whole prompt. Decode is the stage where it writes the answer. Imagine a kitchen. Prefill is prep work, a mountain of chopping that needs lots of hands, and that is raw compute. Decode is plating one dish at a time, which needs a big, fast counter, and that is memory. In one kitchen, a huge prep job can hold up everyone who is waiting for a plate. In the same way, a long prompt can make other people’s answers stutter. So S G Lang can split the work into two kitchens, each built for its own job.
+
+The third goes back to the tree. When we run many machines, a cache-aware load balancer sends each request to the machine that already has its prefix cached, so the reuse keeps working at scale. Other features, like quantization, splitting big models across many G P Us, serving many fine-tuned versions of one model, and multimodal support, are all in the docs.
+
+Now, how does this compare to V L L M? They overlap a lot. Both are fast, reuse the K V cache for shared text, support structured output, and offer a similar style of A P I, so switching is often cheap.
+
+The first difference is how they match shared text. S G Lang matches it more finely, using the radix tree. V L L M matches it in fixed-size blocks, using an idea called Paged Attention. Say a block is sixteen tokens, and two prompts share their first forty tokens. Block matching reuses the first two full blocks, which is thirty-two tokens, and recomputes the other eight. The radix tree reuses all forty. For one request the gap is small, at most one block of tokens. Across millions of requests, it can still add up.
+
+The second difference is maturity. V L L M has been around longer, with the largest community and the longest track record in production. S G Lang is newer, but it has grown fast, and many large companies use it now.
+
+The third is what S G Lang adds on top, which is the frontend language and strong support for structured output.
+
+On raw speed, the answer changes with the model, the workload, and the version, and both projects keep improving. Public benchmarks go out of date quickly, so the only number we can trust is the one we measure on our own traffic.
+
+So the choice comes down to our traffic. If most of it is multi-turn chat, agents, or questions over the same documents, where long prefixes repeat, we test S G Lang first. If most of it is unrelated one-off requests, or if we want the biggest community behind us, we start with V L L M.
+
+The idea behind all of this is simple. Text that repeats should be computed once, and the radix tree is how S G Lang keeps track of it. Before we pick a framework, let’s open our logs and check how much of our prompts is identical from one request to the next. That number tells us how much any of this will matter to us.
+
+That’s it for this one. Thanks for watching, and we’ll be back with the next video soon.
