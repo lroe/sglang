@@ -249,6 +249,7 @@ export const Worksheet: React.FC = () => {
       <g opacity={sP}>
         <SketchRect x={720} y={396} w={210} h={54} fill={GREEN} progress={sP} radius={6} seed="summary-blank" strokeWidth={3} color={GREEN} />
         <T x={825} y={434} text="summary" size={38} color={BG} anchor="middle" />
+        <T x={952} y={436} text=")" size={46} color={INK} />
         <T x={980} y={360} text="blank = summary" size={42} color={GREEN} />
         <T x={980} y={402} text="model fills it" size={36} color={MUTED} opacity={prog(t, fill.start, 0.35)} />
       </g>
@@ -256,6 +257,7 @@ export const Worksheet: React.FC = () => {
       <g opacity={fP}>
         <SketchRect x={720} y={476} w={190} h={54} fill={YELLOW} progress={fP} radius={6} seed="french-blank" strokeWidth={3} color={YELLOW} />
         <T x={815} y={514} text="french" size={38} color={BG} anchor="middle" />
+        <T x={932} y={516} text=")" size={46} color={INK} />
         <T x={980} y={522} text="blank = french" size={42} color={YELLOW} />
         <T x={980} y={566} text="uses summary" size={36} color={MUTED} />
       </g>
