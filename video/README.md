@@ -25,3 +25,16 @@ The Remotion Studio is currently running at that address.
 
 `npm run render` exists but was intentionally not run. The `out/stills/`
 folder only contains review frames used to check layout, contrast, and timing.
+
+
+## 2K Google Colab render
+
+Use `../SGLang_2K_Colab_Render.ipynb` in Google Colab.
+
+- Asks for Google Drive access first, then verifies write access
+- Pulls the latest `main` from `lroe/sglang`
+- Renders at 2560x1440 (2K QHD), H.264/AAC
+- Streams percentage, frame count, fps, ETA, and encoding stage in real time
+- Copies the MP4, render log, and manifest into the approved Drive folder
+
+A full 2K render is CPU-heavy; use a High-RAM Colab runtime.

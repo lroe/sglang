@@ -8,11 +8,14 @@
     "start": "remotion studio src/index.ts --port=3111",
     "typecheck": "tsc --noEmit",
     "render": "remotion render src/index.ts SGLangExplainer out/sglang-explainer.mp4",
-    "still": "remotion still src/index.ts SGLangExplainer"
+    "still": "remotion still src/index.ts SGLangExplainer",
+    "render:2k": "node render-2k.mjs out/sglang-2k.mp4"
   },
   "dependencies": {
+    "@remotion/bundler": "^4.0.541",
     "@remotion/cli": "4.0.541",
     "@remotion/fonts": "4.0.541",
+    "@remotion/renderer": "^4.0.541",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "react": "19.3.1",
