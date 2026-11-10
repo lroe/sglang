@@ -319,7 +319,6 @@ export const TreeIdea: React.FC = () => {
 
       <g opacity={brand}>
         <T x={960} y={850} text="SGLang" size={104} color={INK} anchor="middle" font="head" />
-        <T x={960} y={898} text="a serving framework" size={40} color={MUTED} anchor="middle" />
       </g>
 
       <g opacity={notesP}>
@@ -329,7 +328,6 @@ export const TreeIdea: React.FC = () => {
         {Array.from({length: 5}).map((_, i) => (
           <SketchLine key={i} x1={1405} y1={470 + i * 48} x2={i === 4 ? 1580 : 1695} y2={470 + i * 48} progress={notesP} seed={`notes-line-${i}`} strokeWidth={3} color={COMMENT} />
         ))}
-        <T x={1550} y={768} text="one note per token" size={38} color={MUTED} anchor="middle" />
       </g>
       <Arrow x1={1290} y1={560} x2={1350} y2={560} progress={notesP} color={YELLOW} width={4} seed="to-notes" />
     </Svg>

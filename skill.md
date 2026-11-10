@@ -50,6 +50,11 @@ Generates storyboards, timing sheets, visual scripts, and production prompts mat
   * Hold the completed frame for **1.5 to 3.0 seconds** or more as needed  after narration of that point concludes. we need to ensure the user is able to process everything.
   * Viewers need time to read callouts, register the relationship, and absorb the insight before movement resumes.
   * make sure the user is able to read every text, and see the figures properly- u need to calculate the appropiate time neccessary for them to process it and understand it.
+* **Text Reading-Time Budget (hard rule):**
+  * Every on-screen label must stay fully visible for at least **0.35 s per word + 1.0 s of settle time**, with a **2.0 s floor** for any new label and **2.5 s** for 3–5 word labels.
+  * Reading time starts only after the last letter of that label has finished drawing/popping in.
+  * If a shot cannot afford that time, **shorten or remove the text**. Never add a subtitle just to fill space, and never reveal a label only to cut it 0.5–1.5 s later.
+  * This applies to every callout, not just the final reveal. When in doubt, cut words, not time.
 * **Minimum Processing Hold (hard rule):**
   * The final visual reveal in a scene must have at least **2.0 seconds** of screen time before the cut. If narration makes that impossible, move the reveal earlier when it is contextual, or extend the scene into the next natural pause.
   * Never cut on the same word that completes a diagram.
